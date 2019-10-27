@@ -24,7 +24,7 @@ import entity.Item.ItemBuilder;
 public class TicketMasterClient {
 	private static final String HOST = "https://app.ticketmaster.com";
 	private static final String PATH = "/discovery/v2/events.json";
-	private static final String DEFAULT_KEYWORD = "event";
+	private static final String DEFAULT_KEYWORD = "pop";
 	private static final int DEFAULT_RADIUS = 50;
 	private static final String API_KEY = "Htel1deY4dEdMXWoDA6ndGrtbsbPv45v";
 
@@ -38,8 +38,9 @@ public class TicketMasterClient {
 			e.printStackTrace();
 		}
 
-		
-		String query = String.format("apikey=%s&latlong=%s,%s&keyword=%s&radius=%s", API_KEY, lat, lon, keyword, DEFAULT_RADIUS);
+		String geoHash = GeoHash.encodeGeohash(lat, lon, 8);
+		String query = String.format("apikey=%s&geoPoint=%s&keyword=%s&radius=%s", API_KEY, geoHash, keyword, DEFAULT_RADIUS);
+		//String query = String.format("apikey=%s&latlong=%s,%s&keyword=%s&radius=%s", API_KEY, lat, lon, keyword, DEFAULT_RADIUS);
 		String url = HOST + PATH + "?" + query;
 		StringBuilder responseBody = new StringBuilder();
 		try {
