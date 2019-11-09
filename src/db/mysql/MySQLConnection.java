@@ -230,13 +230,67 @@ public class MySQLConnection implements DBConnection {
 	@Override
 	public String getFullname(String userId) {
 		// TODO Auto-generated method stub
-		return null;
+		if (conn == null) {
+			return "";
+		}
+		String name = "";
+		try {
+			String sql = "SELECT first_name, last_name FROM users WHERE user_id = ?";
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setString(1, userId);
+			ResultSet result = preparedStatement.executeQuery();
+			if (result.next()) {
+				name = result.getString("first_name") + " " + result.getString("last_name");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return name;
 	}
 
 	@Override
 	public boolean verifyLogin(String userId, String password) {
 		// TODO Auto-generated method stub
+		if (conn == null) {
+			return false;
+		}
+		
+		try {
+			String sql = "SELECT user_id FROM users WHERE user_id = ? AND password = ?";
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setString(1, userId);
+			preparedStatement.setString(2, password);
+			ResultSet result = preparedStatement.executeQuery();
+			if (result.next()) {
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
+	
+	@Override
+	public boolean registerUser(String userId, String password, String firstname, String lastname) {
+		if (conn == null) {
+			System.err.println("DB connection failed");
+			return false;
+		}
+
+		try {
+			String sql = "INSERT IGNORE INTO users VALUES (?, ?, ?, ?)";
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setString(1, userId);
+			preparedStatement.setString(2, password);
+			preparedStatement.setString(3, firstname);
+			preparedStatement.setString(4, lastname);
+			
+			return preparedStatement.executeUpdate() == 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;	
+	}
+
 
 }
